@@ -1,7 +1,7 @@
 "use client";
 
 import {myMatchInfoState} from "@/libs/recoil/atoms/myMatchInfoAtom";
-import socket from "@/libs/socket.io/socket";
+import socket from "@/libs/socket.io/socketClient";
 import {IPlayerTimeoutPayload} from "@/shared/interfaces";
 import {useCallback, useEffect, useRef, useState} from "react";
 import {useRecoilValue} from "recoil";

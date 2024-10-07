@@ -6,7 +6,7 @@ import BackButton from "@/components/pages/Home/BackButton";
 import JoinRoom from "@/components/pages/Home/JoinRoom";
 import {Card} from "@/components/UI";
 import {playerInfoState} from "@/libs/recoil/atoms/playerInfoAtom";
-import socket from "@/libs/socket.io/socket";
+import socket from "@/libs/socket.io/socketClient";
 import {ILeaveSocketRoomPayload, INewMatchIdWSResponse, IWSResponse} from "@/shared/interfaces";
 import {useRouter} from "next/navigation";
 import {useCallback, useEffect, useState} from "react";

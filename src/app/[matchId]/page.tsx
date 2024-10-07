@@ -8,7 +8,7 @@ import TwoPlayersInfo from "@/components/TwoPlayersInfo/TwoPlayersInfo";
 import {Card} from "@/components/UI";
 import {myMatchInfoState} from "@/libs/recoil/atoms/myMatchInfoAtom";
 import {playerInfoState} from "@/libs/recoil/atoms/playerInfoAtom";
-import socket from "@/libs/socket.io/socket";
+import socket from "@/libs/socket.io/socketClient";
 import {
     IBoardUpdatePayload,
     ICancelRequestPlayAgainPayload,

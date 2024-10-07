@@ -1,5 +1,5 @@
 import {SubmitButton} from "@/components/UI";
-import socket from "@/libs/socket.io/socket";
+import socket from "@/libs/socket.io/socketClient";
 import {IJoinSocketRoomPayload, IWSResponse} from "@/shared/interfaces";
 import {showToast} from "@/utils/clientUtils";
 import {Field, Formik} from "formik";

@@ -3,7 +3,7 @@
 import {NewPlayerModal} from "@/components/Modal";
 import {Background, LoadingScreen} from "@/components/UI";
 import {playerInfoState} from "@/libs/recoil/atoms/playerInfoAtom";
-import socket from "@/libs/socket.io/socket";
+import socket from "@/libs/socket.io/socketClient";
 import {
     IConnectPlayerPayload,
     IConnectPlayerWSResponse,

@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useRef, useState} from "react";
 import Cell from "./Cell";
 import {useRecoilValue} from "recoil";
-import socket from "@/libs/socket.io/socket";
+import socket from "@/libs/socket.io/socketClient";
 import {IHighlightMove, IPlayerMovePayload} from "@/shared/interfaces";
 import {myMatchInfoState} from "@/libs/recoil/atoms/myMatchInfoAtom";
 import {PlayerType, Position} from "@/shared/types";
