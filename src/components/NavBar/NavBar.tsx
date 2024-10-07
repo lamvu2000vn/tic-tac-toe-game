@@ -4,7 +4,7 @@ import {useRecoilValue} from "recoil";
 import {myMatchInfoState} from "@/libs/recoil/atoms/myMatchInfoAtom";
 import {MdOutlineReplay} from "react-icons/md";
 import {GoHomeFill} from "react-icons/go";
-import {useEffect, useState} from "react";
+import {memo, useEffect, useState} from "react";
 import {ConfirmLeaveRoomModal} from "../Modal";
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
     onLeaveRoom: () => void;
 }
 
-export default function NavBar(props: Props) {
+export default memo(function NavBar(props: Props) {
     const myMatchInfo = useRecoilValue(myMatchInfoState)!;
     const [showConfirmLeaveRoomModal, setShowConfirmLeaveRoomModal] = useState<boolean>(false);
 
@@ -65,4 +65,4 @@ export default function NavBar(props: Props) {
             </div>
         </div>
     );
-}
+});

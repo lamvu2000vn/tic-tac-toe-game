@@ -60,7 +60,7 @@ class Room implements IModel<IMatchTableFields> {
         }
     ): Promise<ISqlite.RunResult<Statement>> => {
         const fields = Object.entries(data)
-            .filter(([_, value]) => value !== undefined) // Loại bỏ các giá trị `undefined`
+            .filter(([key, value]) => value !== undefined) // Loại bỏ các giá trị `undefined`
             .map(([key]) => `${key} = ?`); // Sử dụng placeholders thay cho giá trị trực tiếp
 
         const values = Object.values(data).filter((value) => value !== undefined); // Lấy các giá trị tương ứng
