@@ -7,7 +7,7 @@ export default function Instruct() {
             <ol className="text-justify *:mb-2 last:*:mb-0">
                 <li>
                     <strong>Người chơi: </strong>Có hai người chơi, mỗi người chọn một ký hiệu riêng. Một người sẽ là
-                    "X" và người còn lại sẽ là "O".
+                    &quot;X&quot; và người còn lại sẽ là &quot;O&quot;.
                 </li>
                 <li>
                     <strong>Mục tiêu: </strong>Người chơi nào có được <strong>5</strong> ký hiệu của mình liên tiếp theo
@@ -15,7 +15,7 @@ export default function Instruct() {
                 </li>
                 <li>
                     <strong>Lượt chơi: </strong>Hai người chơi sẽ lần lượt đánh dấu một ô trên bàn cờ. Người đầu tiên
-                    đặt ký hiệu "X", sau đó là "O", và cứ tiếp tục luân phiên.
+                    đặt ký hiệu &quot;X&quot;, sau đó là &quot;O&quot;, và cứ tiếp tục luân phiên.
                 </li>
                 <li>
                     <strong>Kết thúc trò chơi: </strong>Trò chơi kết thúc khi có một người chơi thắng.
