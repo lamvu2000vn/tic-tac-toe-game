@@ -6,7 +6,7 @@ import {IPlayerTimeoutPayload} from "@/shared/interfaces";
 import {useCallback, useEffect, useRef, useState} from "react";
 import {useRecoilValue} from "recoil";
 
-const TIMEOUT = 600;
+const TIMEOUT = 30;
 
 export default function CountDown() {
     const [counter, setCounter] = useState<number>(TIMEOUT);
