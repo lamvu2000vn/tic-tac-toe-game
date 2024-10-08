@@ -21,7 +21,7 @@ export default memo(function NewPlayerModal(props: Props) {
                 }}
                 validationSchema={Yup.object({
                     name: Yup.string()
-                        .max(20, "Tên người chơi tối đa 20 ký tự")
+                        .max(15, "Tên người chơi tối đa 15 ký tự")
                         .required("Vui lòng nhập tên người chơi"),
                 })}
                 onSubmit={async (values) => {
@@ -36,7 +36,7 @@ export default memo(function NewPlayerModal(props: Props) {
                                 Bạn là:
                             </label>
                             <div className="flex flex-1 flex-col gap-2">
-                                <Field type="text" id="name" name="name" placeholder="Tên người chơi" />
+                                <Field type="text" id="name" name="name" placeholder="Tên người chơi" maxLength="15" />
                                 {formik.touched.name && formik.errors.name && (
                                     <small className="text-sm text-red-400">*{formik.errors.name}</small>
                                 )}

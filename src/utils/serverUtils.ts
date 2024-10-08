@@ -1,17 +1,9 @@
 import {IMatchInfo, IPlayerInfo, IPlayerInfoOfMatch} from "@/shared/interfaces";
 import {PlayerType, Position} from "@/shared/types";
+import {randomBytes} from "crypto";
 
-export const generateUniqueString = (length: number = 20): string => {
-    // Get the current timestamp in milliseconds
-    const timestamp = Date.now().toString(16);
-
-    // Generate random bytes and convert them to a hex string
-    const randomPart = Array.from(crypto.getRandomValues(new Uint8Array(length)))
-        .map((b) => ("0" + b.toString(16)).slice(-2))
-        .join("");
-
-    // Combine the timestamp with the random string and trim to the desired length
-    return (timestamp + randomPart).slice(0, length);
+export const generateUniqueString = (size: number): string => {
+    return randomBytes(size).toString("hex").slice(0, size);
 };
 
 export const checkWin = (playerMoves: Position[]): {isWin: boolean; moves: Position[]; direction: string} => {

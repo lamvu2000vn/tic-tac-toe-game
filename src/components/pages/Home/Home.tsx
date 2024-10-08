@@ -43,10 +43,11 @@ export default function Home(props: Props) {
                 />
             </div>
             <div className="w-full mb-5">
-                <div className="bg-gradient-to-r from-x-player via-purple-500 to-o-player bg-[length:150%_150%] animate-gradient-move h-10 sm:h-14 w-full rounded-2xl flex items-center justify-center">
-                    <h5 className="text-lg sm:text-xl font-semibold text-primary-1">
-                        Xin chào! {playerInfo.name || ""}
-                    </h5>
+                <div className="px-4 bg-gradient-to-r from-x-player via-purple-500 to-o-player bg-[length:150%_150%] animate-gradient-move h-12 sm:h-14 w-full rounded-2xl flex items-center justify-center">
+                    <div className="flex items-center overflow-hidden gap-2 text-lg sm:text-xl font-semibold text-primary-1">
+                        <span className="flex-shrink-0">Xin chào!</span>
+                        <span className="w-full truncate">{playerInfo.name || ""}</span>
+                    </div>
                 </div>
             </div>
             <div className="flex flex-col items-stretch gap-2 overflow-y-auto">

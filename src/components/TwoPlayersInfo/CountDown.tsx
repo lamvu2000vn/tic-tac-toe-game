@@ -6,7 +6,7 @@ import {IPlayerTimeoutPayload} from "@/shared/interfaces";
 import {useCallback, useEffect, useRef, useState} from "react";
 import {useRecoilValue} from "recoil";
 
-const TIMEOUT = 60;
+const TIMEOUT = 600;
 
 export default function CountDown() {
     const [counter, setCounter] = useState<number>(TIMEOUT);
@@ -53,8 +53,8 @@ export default function CountDown() {
     }, [handleTimeout, isTimeout]);
 
     return (
-        <div className="w-14 h-14 flex items-center justify-center">
-            <span className="text-2xl">{counter}</span>
+        <div className="w-14 sm:w-16 flex items-center justify-center">
+            <span className="text-xl sm:text-2xl">{counter}</span>
         </div>
     );
 }

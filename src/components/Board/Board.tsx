@@ -15,12 +15,12 @@ interface Props {
 }
 
 export default function Board(props: Props) {
-    const myMatchInfo = useRecoilValue(myMatchInfoState);
+    const myMatchInfo = useRecoilValue(myMatchInfoState)!;
     const [boardMatrix, setBoardMatrix] = useState<Array<Array<number>> | null>(null);
 
-    const {matchId, myInfo, opponentInfo, currentTurn, matchStatus} = myMatchInfo!;
+    const {matchId, myInfo, opponentInfo, currentTurn, matchStatus} = myMatchInfo;
 
-    const boardRef = useRef<HTMLDivElement | null>(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
 
     const handleMove = useCallback(
         async (position: Position) => {
@@ -54,7 +54,7 @@ export default function Board(props: Props) {
                     : opponentMoveSet.has(key)
                     ? opponentInfo.playerType
                     : null;
-                const highlightMove = props.highlightMoves.find(
+                const isHighlightMark = props.highlightMoves.some(
                     (highlight) => highlight.position.x === x && highlight.position.y === y
                 );
 
@@ -66,7 +66,7 @@ export default function Board(props: Props) {
                         isMyTurn={currentTurn === "me"}
                         myType={myInfo.playerType}
                         matchStatus={matchStatus}
-                        highlightMark={highlightMove ? highlightMove.playerType : null}
+                        isHighlightMark={isHighlightMark}
                         onMove={handleMove}
                     />
                 );
@@ -74,30 +74,24 @@ export default function Board(props: Props) {
         );
     };
 
-    // useEffect(() => {
-    //     if (!myMatchInfo) return;
+    useEffect(() => {
+        const container = containerRef.current!;
 
-    //     const board = boardRef.current!;
+        const containerHeight = container.clientHeight;
+        const containerWidth = container.clientWidth;
 
-    //     // Lấy chiều cao và chiều rộng của thẻ div
-    //     const divHeight = board.clientHeight;
-    //     const divWidth = board.clientWidth;
+        const contentHeight = container.scrollHeight;
+        const contentWidth = container.scrollWidth;
 
-    //     // Lấy chiều cao và chiều rộng của nội dung bên trong thẻ div
-    //     const contentHeight = board.scrollHeight;
-    //     const contentWidth = board.scrollWidth;
+        const scrollTop = (contentHeight - containerHeight) / 2;
+        const scrollLeft = (contentWidth - containerWidth) / 2;
 
-    //     // Tính toán vị trí cuộn đến chính giữa
-    //     const scrollTop = (contentHeight - divHeight) / 2;
-    //     const scrollLeft = (contentWidth - divWidth) / 2;
-
-    //     // Cuộn đến vị trí trung tâm
-    //     board.scrollTo({
-    //         top: scrollTop,
-    //         left: scrollLeft,
-    //         behavior: "auto",
-    //     });
-    // }, [myMatchInfo]);
+        container.scrollTo({
+            top: scrollTop,
+            left: scrollLeft,
+            behavior: "auto",
+        });
+    }, []);
 
     // Generate matrix once when component mounts or when the number of cells changes
     useEffect(() => {
@@ -115,7 +109,7 @@ export default function Board(props: Props) {
     }, [myMatchInfo]);
 
     return (
-        <div ref={boardRef} className="flex-1 overflow-auto">
+        <div ref={containerRef} className="flex-1 overflow-auto">
             <div
                 className="grid"
                 style={{

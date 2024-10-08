@@ -16,13 +16,13 @@ const createTables = (db: Database) => {
     return db.exec(`
         CREATE TABLE IF NOT EXISTS players (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name VARCHAR(20) NOT NULL,
+            name VARCHAR(15) NOT NULL,
             socket_id VARCHAR(20) DEFAULT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
 
         CREATE TABLE IF NOT EXISTS matches (
-            id VARCHAR(20) PRIMARY KEY,
+            id VARCHAR(15) PRIMARY KEY,
             player_1_id INT NOT NULL,
             player_2_id INT NOT NULL,
             player_1_score TINYINT DEFAULT 0,

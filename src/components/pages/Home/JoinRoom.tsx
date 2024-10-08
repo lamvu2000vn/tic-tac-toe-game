@@ -1,6 +1,7 @@
 import {SubmitButton} from "@/components/UI";
 import socket from "@/libs/socket.io/socketClient";
 import {IJoinSocketRoomPayload, IWSResponse} from "@/shared/interfaces";
+import {JoinRoomError} from "@/shared/types";
 import {showToast} from "@/utils/clientUtils";
 import {Field, Formik} from "formik";
 import {useState} from "react";
@@ -20,16 +21,19 @@ export default function JoinRoom() {
             if (response.status === "ok") {
                 console.log("Join room successfully");
             } else {
-                switch (response.message) {
-                    case "room not found":
-                        showToast("Không tìm thấy trận đấu", "info");
+                switch (response.message as JoinRoomError) {
+                    case "Room not found":
+                        showToast("Không tìm thấy phòng.", "info");
                         break;
-                    case "missing or full players":
-                        showToast("Không thể tham gia vào trận đấu", "info");
+                    case "Match started":
+                        showToast("Trận đấu đã bắt đầu.", "info");
+                        break;
+                    case "Couldn't join room":
+                        showToast("Không thể tham gia vào trận đấu.", "info");
                         break;
                     case "error":
                     default:
-                        showToast("Đã có lỗi xảy ra", "error");
+                        showToast("Đã có lỗi xảy ra.", "error");
                         break;
                 }
                 setIsSubmitting(false);

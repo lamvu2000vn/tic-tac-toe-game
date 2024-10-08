@@ -17,22 +17,21 @@ export default function TwoPlayersInfo() {
         const textColorClass = winnerType === "XPlayer" ? "text-rose-500" : "text-blue-500";
 
         return (
-            <div className={`h-[60px] w-full flex items-center justify-center ${bgClass} ${shadowClass}`}>
-                <GiTrophyCup className="w-6 h-6 mr-3" />
-                <div className="text-xl font-semibole">
-                    <span>
-                        The winner is{" "}
-                        <strong className={`${textColorClass}`}>
-                            {winner === "me" ? myInfo.name : opponentInfo.name}
-                        </strong>
-                    </span>
+            <div className={`h-[60px] w-full px-2 flex items-center justify-center gap-2 ${bgClass} ${shadowClass}`}>
+                <GiTrophyCup className="w-6 h-6" />
+                <div className="text-lg sm:text-xl flex items-center gap-2">
+                    <span className="flex-shrink-0">Người chiến thắng là</span>
+                    <strong className={`${textColorClass} truncate`}>
+                        {winner === "me" ? myInfo.name : opponentInfo.name}
+                    </strong>
                 </div>
+                <GiTrophyCup className="w-6 h-6" />
             </div>
         );
     }
 
     return (
-        <div className="w-full flex items-stretch">
+        <div className="w-full flex items-stretch gap-1 sm:gap-2">
             <PlayerInfo playerInfo={myMatchInfo.myInfo} side="left" isPlayerTurn={myMatchInfo.currentTurn === "me"} />
             <CountDown />
             <PlayerInfo

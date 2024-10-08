@@ -29,7 +29,7 @@ import {
     randomPlayerType,
 } from "../../utils/serverUtils";
 import {Player, Match, Move} from "../../Database/models";
-import {PlayerType} from "@/shared/types";
+import {JoinRoomError, PlayerType} from "@/shared/types";
 
 export default class SocketHandle {
     private player: IPlayerInfo | null = null;
@@ -45,7 +45,7 @@ export default class SocketHandle {
         this.socket.on("newSocketRoom", this.handleNewSocketRoom.bind(this));
         this.socket.on("leaveSocketRoom", this.handleLeaveSocketRoom.bind(this));
         this.socket.on("joinSocketRoom", this.handleJoinSocketRoom.bind(this));
-        this.socket.on("readyToStart", this.readyToStart.bind(this));
+        this.socket.on("readyToStart", this.handleReadyToStart.bind(this));
         this.socket.on("playerMove", this.handlePlayerMove.bind(this));
         this.socket.on("playerTimeout", this.handlePlayerTimeout.bind(this));
         this.socket.on("requestPlayAgain", this.handleRequestPlayAgain.bind(this));
@@ -81,7 +81,7 @@ export default class SocketHandle {
                 player: newPlayer,
             };
         } catch (err) {
-            console.log(err);
+            console.log("🚀 ~ SocketHandle ~ handleNewPlayer ~ err:", err);
             response.status = "not ok";
         } finally {
             callback(response);
@@ -118,6 +118,7 @@ export default class SocketHandle {
             response.message = "success";
             response.data.playerConnected = playerConnected;
         } catch (err: Error | unknown) {
+            console.log("🚀 ~ SocketHandle ~ err:", err);
             response.status = "not ok";
             response.message = err instanceof Error ? err.message : "error";
         } finally {
@@ -133,7 +134,7 @@ export default class SocketHandle {
         };
 
         try {
-            const socketRoomId = generateUniqueString(20);
+            const socketRoomId = generateUniqueString(15);
 
             this.socket.join(socketRoomId);
 
@@ -143,6 +144,7 @@ export default class SocketHandle {
                 roomId: socketRoomId,
             };
         } catch (err) {
+            console.log("🚀 ~ SocketHandle ~ handleNewSocketRoom ~ err:", err);
             console.log(err);
             response.status = "not ok";
         } finally {
@@ -175,7 +177,8 @@ export default class SocketHandle {
             const {roomId} = payload;
             const socketRoom = this.io.sockets.adapter.rooms.get(roomId);
 
-            if (!socketRoom || socketRoom.size >= 2) throw new Error("room not found");
+            if (!socketRoom) throw new Error("Room not found" as JoinRoomError);
+            if (socketRoom.size >= 2) throw new Error("Match started" as JoinRoomError);
 
             this.socket.join(roomId);
 
@@ -188,7 +191,7 @@ export default class SocketHandle {
                 )
             );
 
-            if (players.length !== 2) throw new Error("missing or full players");
+            if (players.length !== 2) throw new Error("Couldn't join room" as JoinRoomError);
 
             await _Match.insert({
                 id: roomId,
@@ -199,12 +202,12 @@ export default class SocketHandle {
                 match_status: "in-progress",
             });
 
-            await this.io.to(roomId).timeout(5000).emitWithAck("prepareTheGame", {matchId: roomId});
+            await this.io.to(roomId).timeout(10000).emitWithAck("prepareTheGame", {matchId: roomId});
 
             response.status = "ok";
             response.message = "success";
         } catch (err: Error | unknown) {
-            console.log(err);
+            console.log("🚀 ~ SocketHandle ~ handleJoinSocketRoom ~ Error:", err);
             response.status = "not ok";
             response.message = err instanceof Error ? err.message : "error";
         } finally {
@@ -212,14 +215,14 @@ export default class SocketHandle {
         }
     }
 
-    private async readyToStart(payload: IReadyToStartPayload, callback: (response: IWSResponse) => void) {
+    private async handleReadyToStart(payload: IReadyToStartPayload, callback: (response: IWSResponse) => void) {
         const response: IWSResponse = {
             status: "not ok",
             message: "",
             data: {},
         };
 
-        const addPlayerToReadyList = (roomId: string, player: IPlayerInfo): void => {
+        const upgradePlayerAddPlayerToReadyList = (roomId: string, player: IPlayerInfo): IPlayerInfoOfMatch[] => {
             if (!this.readyToStartRooms.has(roomId)) this.readyToStartRooms.set(roomId, []);
 
             const room = this.readyToStartRooms.get(roomId)!;
@@ -232,16 +235,23 @@ export default class SocketHandle {
                     playerType === "OPlayer" ? "XPlayer" : "OPlayer"
                 );
 
-                const newValue = [...room, newPlayerInfo];
+                const newValue = [...room, newPlayerInfo] as IPlayerInfoOfMatch[];
 
                 this.readyToStartRooms.set(roomId, newValue);
+
+                return newValue;
             }
+
+            return room;
         };
 
         try {
             const {matchId, player} = payload;
-            const _Match = new Match(this.db);
             const socketRoom = this.io.sockets.adapter.rooms.get(matchId);
+
+            if (!socketRoom) throw new Error("Room not found");
+
+            const _Match = new Match(this.db);
             const matchInfo = await _Match.findById(matchId);
             const playerIds = [matchInfo?.player_1_id, matchInfo?.player_2_id];
 
@@ -249,16 +259,14 @@ export default class SocketHandle {
 
             if (!isJoined) throw new Error("Player not joined");
 
-            addPlayerToReadyList(matchId, payload.player);
-
-            const readyRoom = this.readyToStartRooms.get(matchId)!;
+            const readyRoom = upgradePlayerAddPlayerToReadyList(matchId, payload.player);
 
             if (readyRoom.length === 2) {
                 const xPlayer = readyRoom.find((player) => player.playerType === "XPlayer")!;
                 const oPlayer = readyRoom.find((player) => player.playerType === "OPlayer")!;
                 const matchInfo = initializeMatchInfo(matchId, xPlayer, oPlayer);
 
-                await this.io.to(matchId).timeout(5000).emitWithAck("startTheGame", matchInfo);
+                await this.io.to(matchId).timeout(10000).emitWithAck("startTheGame", matchInfo);
 
                 this.readyToStartRooms.delete(matchId);
             }
@@ -325,7 +333,7 @@ export default class SocketHandle {
                 winMoves: check.isWin ? check.moves : [],
             };
 
-            this.io.to(matchId).timeout(5000).emitWithAck("boardUpdate", boardUpdatePayload);
+            this.io.to(matchId).timeout(10000).emitWithAck("boardUpdate", boardUpdatePayload);
 
             response.status = "ok";
             response.message = "success";
@@ -363,7 +371,7 @@ export default class SocketHandle {
 
             await this.io
                 .to(matchId)
-                .timeout(5000)
+                .timeout(10000)
                 .emitWithAck("endTheGame", {
                     winner: player.playerType === "XPlayer" ? "OPlayer" : "XPlayer",
                 } as IEndTheGamePayload);
@@ -398,7 +406,7 @@ export default class SocketHandle {
 
             this.socket
                 .to(receiveIds)
-                .timeout(5000)
+                .timeout(10000)
                 .emitWithAck("invitePlayAgain", {
                     requester,
                 } as {requester: IPlayerInfo});
@@ -432,7 +440,7 @@ export default class SocketHandle {
 
             this.io
                 .to(matchId)
-                .timeout(5000)
+                .timeout(10000)
                 .emitWithAck("canceledInvitePlayAgain", {
                     canceller: canceller,
                 } as {canceller: IPlayerInfo});
@@ -492,7 +500,7 @@ export default class SocketHandle {
             });
             await _Move.deleteByMatchId(payload.matchId);
 
-            await this.io.to(payload.matchId).timeout(5000).emitWithAck("startTheGame", newMatchInfo);
+            await this.io.to(payload.matchId).timeout(10000).emitWithAck("startTheGame", newMatchInfo);
 
             response.status = "ok";
             response.message = "success";
@@ -528,7 +536,7 @@ export default class SocketHandle {
             await _Match.delete(matchId);
             await this.io
                 .to(socketIds)
-                .timeout(5000)
+                .timeout(10000)
                 .emitWithAck("playerHasLeft", {canceller: player} as IRoomCancelledPayload);
 
             response.status = "ok";
@@ -566,7 +574,7 @@ export default class SocketHandle {
                         await _Match.delete(theMatch.id);
                         await this.io
                             .to(socketIds)
-                            .timeout(5000)
+                            .timeout(10000)
                             .emitWithAck("playerHasLeft", {canceller: this.player} as IRoomCancelledPayload);
                     }
                 }

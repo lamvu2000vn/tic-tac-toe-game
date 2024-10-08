@@ -118,7 +118,7 @@ export default function Page(props: Props) {
             const response: IWSResponse = await socket.emitWithAck("readyToStart", payload);
 
             if (response.status === "not ok") {
-                if (response.message === "Player not joined") setIsMatchExists(false);
+                setIsMatchExists(false);
             }
         })();
     }, [playerInfo, props.params.matchId]);
@@ -143,19 +143,18 @@ export default function Page(props: Props) {
             const convertData = convertToMyMatchInfo(playerInfo, payload);
 
             if (convertData.currentTurn === "me") {
-                showToast("Bạn đi lượt đầu tiên");
+                showToast("Bạn lượt đầu tiên");
             } else {
                 showToast("Đối thủ lượt đầu tiên");
             }
 
-            setHighlightMoves([]);
-            setShowPlayAgainModal(false);
-            setShowWaitingForAcceptModal(false);
-            setPlayAgainRequester(null);
             setMyMoves([]);
             setOpponentMoves([]);
+            setHighlightMoves([]);
+            setPlayAgainRequester(null);
+            setShowPlayAgainModal(false);
+            setShowWaitingForAcceptModal(false);
             setPreparingMatchModal(false);
-
             setMyMatchInfo(convertData);
 
             callback({
@@ -171,6 +170,7 @@ export default function Page(props: Props) {
                 myInfo: {...myMatchInfo!.myInfo},
                 opponentInfo: {...myMatchInfo!.opponentInfo},
             };
+
             const {isWin, playerType, position, winMoves} = payload;
 
             if (isWin) {
@@ -188,6 +188,7 @@ export default function Page(props: Props) {
                 );
             } else {
                 updatedInfo.currentTurn = updatedInfo.currentTurn === "me" ? "opponent" : "me";
+
                 setHighlightMoves([
                     {
                         position: position,
@@ -288,11 +289,11 @@ export default function Page(props: Props) {
             });
         };
 
+        socket.on("startTheGame", onStartTheGame);
         socket.on("boardUpdate", onBoardUpdate);
         socket.on("endTheGame", onEndTheGame);
         socket.on("invitePlayAgain", onInvitePlayAgain);
         socket.on("canceledInvitePlayAgain", onCanceledInvitePlayAgain);
-        socket.on("startTheGame", onStartTheGame);
         socket.on("playerHasLeft", onPlayerHasLeft);
 
         return () => {
@@ -310,7 +311,7 @@ export default function Page(props: Props) {
     }
 
     return (
-        <Card className="w-full h-full max-w-lg rounded-none overflow-hidden flex flex-col items-stretch gap-8">
+        <Card className="w-full h-full max-w-xl rounded-none overflow-hidden flex flex-col items-stretch gap-8">
             <PreparingMatchModal show={showPreparingMatchModal} />
             {myMatchInfo && (
                 <>

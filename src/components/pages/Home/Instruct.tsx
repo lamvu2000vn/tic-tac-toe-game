@@ -21,8 +21,8 @@ export default function Instruct() {
                     <strong>Kết thúc trò chơi: </strong>Trò chơi kết thúc khi có một người chơi thắng.
                 </li>
                 <li>
-                    <strong>Cách chiến thắng: </strong>Để thắng, một người chơi phải tạo ra một hàng gồm ba ký hiệu
-                    giống nhau (theo hàng ngang, dọc hoặc chéo).
+                    <strong>Cách chiến thắng: </strong>Để thắng, một người chơi phải tạo ra một hàng gồm{" "}
+                    <strong>5</strong> ký hiệu giống nhau (theo hàng ngang, dọc hoặc chéo).
                 </li>
             </ol>
         </div>

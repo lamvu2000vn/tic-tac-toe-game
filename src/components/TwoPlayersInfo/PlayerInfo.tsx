@@ -24,26 +24,26 @@ export default function PlayerInfo(props: Props) {
         : "grayscale";
 
     return (
-        <div
-            className={`p-2 w-full flex flex-1 ${justifyContent} items-center gap-4 ${bgColor} ${borderRadius} ${myTurnBg}`}
-        >
-            {isLeftSide ? (
-                <>
-                    <div className="flex flex-col items-end">
-                        <b className={`${textColor} text-base`}>{name}</b>
-                        <b className={`${textColor} text-sm`}>{scores}</b>
-                    </div>
-                    <Avatar playerType={playerType!} />
-                </>
-            ) : (
-                <>
-                    <Avatar playerType={playerType!} />
-                    <div className="flex flex-col">
-                        <b className={`${textColor} text-base`}>{name}</b>
-                        <b className={`${textColor} text-sm`}>{scores}</b>
-                    </div>
-                </>
-            )}
+        <div className={`p-2 flex-1 overflow-hidden ${bgColor} ${borderRadius} ${myTurnBg}`}>
+            <div className={`flex ${justifyContent} items-center gap-4 `}>
+                {isLeftSide ? (
+                    <>
+                        <div className="flex flex-col items-end overflow-hidden">
+                            <b className={`${textColor} text-base w-full truncate`}>{name}</b>
+                            <b className={`${textColor} text-sm`}>{scores}</b>
+                        </div>
+                        <Avatar playerType={playerType!} />
+                    </>
+                ) : (
+                    <>
+                        <Avatar playerType={playerType!} />
+                        <div className="flex flex-col overflow-hidden">
+                            <b className={`${textColor} text-base w-full truncate`}>{name}</b>
+                            <b className={`${textColor} text-sm`}>{scores}</b>
+                        </div>
+                    </>
+                )}
+            </div>
         </div>
     );
 }

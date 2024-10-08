@@ -8,7 +8,7 @@ interface Props {
 export default function Avatar(props: Props) {
     return (
         <div
-            className={`h-10 w-10 flex items-center justify-center ${
+            className={`h-10 w-10 flex items-center justify-center flex-shrink-0 ${
                 props.playerType === "XPlayer" ? "bg-rose-500" : "bg-blue-500"
             }  rounded-full`}
         >
