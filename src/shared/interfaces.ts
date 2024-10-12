@@ -177,5 +177,4 @@ export interface IMessage {
     type: MessageType;
     content: string;
 }
-
 // ======================= END GAME INFO =======================

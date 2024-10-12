@@ -2,8 +2,9 @@ import {IMessage} from "@/shared/interfaces";
 import StickerItem from "../NavBar/ChatBox/Sticker/StickerItem";
 import {Card} from "../UI";
 import {Transition} from "react-transition-group";
-import {useContext, useRef} from "react";
-import {BoardContext} from "@/app/[matchId]/page";
+import {useRef} from "react";
+import {useRecoilValue} from "recoil";
+import {boardInfoState} from "@/libs/recoil/atoms/boardInfoAtom";
 
 interface Props {
     show: boolean;
@@ -12,10 +13,10 @@ interface Props {
 }
 
 export default function Message(props: Props) {
-    const boardContext = useContext(BoardContext);
+    const boardInfo = useRecoilValue(boardInfoState)!;
+    const boardRect = boardInfo.getBoundingClientRect();
+
     const nodeRef = useRef<HTMLDivElement | null>(null);
-    const boardRef = boardContext?.boardRef.current;
-    const boardRect = boardRef?.getBoundingClientRect();
 
     const isLeftSide = props.side === "left";
     const nonRadius = isLeftSide ? "rounded-tl-none" : "rounded-tr-none";

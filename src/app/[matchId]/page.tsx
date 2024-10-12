@@ -6,6 +6,7 @@ import NavBar from "@/components/NavBar/NavBar";
 import {MatchNotExists} from "@/components/pages/Match";
 import TwoPlayersInfo from "@/components/TwoPlayersInfo/TwoPlayersInfo";
 import {Card} from "@/components/UI";
+import {boardInfoState} from "@/libs/recoil/atoms/boardInfoAtom";
 import {myMatchInfoState} from "@/libs/recoil/atoms/myMatchInfoAtom";
 import {playerInfoState} from "@/libs/recoil/atoms/playerInfoAtom";
 import socket from "@/libs/socket.io/socketClient";
@@ -26,15 +27,11 @@ import {
 import {Position} from "@/shared/types";
 import {convertToMyMatchInfo, showToast} from "@/utils/clientUtils";
 import {useRouter} from "next/navigation";
-import {createContext, useCallback, useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import {useRecoilState, useRecoilValue} from "recoil";
 
 const WAITING_ACCEPT_TIMEOUT = 60000; // 60s
 const MY_MATCH_INFO_TIMEOUT = 60000; // 60s
-
-export const BoardContext = createContext<{
-    boardRef: React.MutableRefObject<HTMLDivElement | null>;
-} | null>(null);
 
 interface Props {
     params: {
@@ -45,6 +42,8 @@ export default function Page(props: Props) {
     const router = useRouter();
     const playerInfo = useRecoilValue(playerInfoState)!;
     const [myMatchInfo, setMyMatchInfo] = useRecoilState(myMatchInfoState);
+    const [boardInfo, setBoardInfo] = useRecoilState(boardInfoState);
+
     const [isMatchExists, setIsMatchExists] = useState<boolean>(true);
     const [highlightMoves, setHighlightMoves] = useState<IHighlightMove[]>([]);
     const [playAgainRequester, setPlayAgainRequester] = useState<IPlayerInfo | null>(null);
@@ -94,6 +93,12 @@ export default function Page(props: Props) {
             player: myMatchInfo!.myInfo,
         } as ILeaveTheMatchPayload);
     }, [myMatchInfo]);
+
+    useEffect(() => {
+        if (boardRef.current) {
+            setBoardInfo(boardRef.current);
+        }
+    }, [setBoardInfo]);
 
     // Waiting for play again response
     useEffect(() => {
@@ -315,37 +320,35 @@ export default function Page(props: Props) {
     }
 
     return (
-        <BoardContext.Provider value={{boardRef: boardRef}}>
-            <Card
-                ref={boardRef}
-                className="w-full h-full max-w-xl rounded-none overflow-hidden flex flex-col items-stretch"
-            >
-                <PreparingMatchModal show={showPreparingMatchModal} />
-                {myMatchInfo && (
-                    <>
-                        <TwoPlayersInfo />
-                        <Board
-                            numberXCells={20}
-                            numberYCells={20}
-                            highlightMoves={highlightMoves}
-                            myMoves={myMoves}
-                            opponentMoves={opponentMoves}
-                        />
-                        <NavBar onRequestPlayAgain={handleRequestPlayerAgain} onLeaveRoom={handleLeaveRoom} />
-                        <InvitePlayAgainModal
-                            show={showPlayAgainModal}
-                            requester={playAgainRequester}
-                            onDeclineInvitation={() => handleCancelRequestPlayAgain(playerInfo)}
-                            onAcceptInvitation={handleAcceptInvitation}
-                        />
-                        <WaitingForAcceptModal
-                            show={showWaitingForAcceptModal}
-                            onCancelWaiting={() => handleCancelRequestPlayAgain(playerInfo)}
-                        />
-                        <RoomCancelledModal show={showRoomCancelledModal} />
-                    </>
-                )}
-            </Card>
-        </BoardContext.Provider>
+        <Card
+            ref={boardRef}
+            className="w-full h-full max-w-xl rounded-none overflow-hidden flex flex-col items-stretch"
+        >
+            <PreparingMatchModal show={showPreparingMatchModal} />
+            {myMatchInfo && boardInfo && (
+                <>
+                    <TwoPlayersInfo />
+                    <Board
+                        numberXCells={20}
+                        numberYCells={20}
+                        highlightMoves={highlightMoves}
+                        myMoves={myMoves}
+                        opponentMoves={opponentMoves}
+                    />
+                    <NavBar onRequestPlayAgain={handleRequestPlayerAgain} onLeaveRoom={handleLeaveRoom} />
+                    <InvitePlayAgainModal
+                        show={showPlayAgainModal}
+                        requester={playAgainRequester}
+                        onDeclineInvitation={() => handleCancelRequestPlayAgain(playerInfo)}
+                        onAcceptInvitation={handleAcceptInvitation}
+                    />
+                    <WaitingForAcceptModal
+                        show={showWaitingForAcceptModal}
+                        onCancelWaiting={() => handleCancelRequestPlayAgain(playerInfo)}
+                    />
+                    <RoomCancelledModal show={showRoomCancelledModal} />
+                </>
+            )}
+        </Card>
     );
 }
