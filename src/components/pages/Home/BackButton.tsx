@@ -6,7 +6,7 @@ interface Props {
 
 export default function BackButton(props: Props) {
     return (
-        <div className="flex mb-4">
+        <div className="flex">
             <button type="button" className="btn btn-ghost btn-sm p-0" onClick={props.onBack}>
                 <MdKeyboardArrowLeft className="w-8 h-8" />
             </button>

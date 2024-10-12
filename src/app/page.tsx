@@ -108,7 +108,11 @@ export default function Page() {
     return (
         <>
             <Card className="w-[90%] h-max max-h-[95vh] overflow-auto max-w-lg px-12 py-10 sm:px-20 sm:py-10">
-                {breadcrumb.length > 1 && <BackButton onBack={handleBackToPrevCrumb} />}
+                {breadcrumb.length > 1 && (
+                    <div className="mb-4">
+                        <BackButton onBack={handleBackToPrevCrumb} />
+                    </div>
+                )}
                 {Component}
             </Card>
             <CreatingRoomModal show={showCreatingRoomModal} />

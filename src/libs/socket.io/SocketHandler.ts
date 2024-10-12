@@ -20,6 +20,8 @@ import {
     INewPlayerWSResponse,
     IReadyToStartPayload,
     IWSResponse,
+    ISendMessagePayload,
+    IShowMessagePayload,
 } from "@/shared/interfaces";
 import {
     checkWin,
@@ -52,6 +54,7 @@ export default class SocketHandle {
         this.socket.on("cancelRequestPlayAgain", this.handleCancelRequestPlayAgain.bind(this));
         this.socket.on("acceptInvitation", this.handleAcceptInvitation.bind(this));
         this.socket.on("leaveTheMatch", this.handleLeaveTheMatch.bind(this));
+        this.socket.on("sendMessage", this.handleSendMessage.bind(this));
         this.socket.on("disconnect", this.handleDisconnect.bind(this));
     }
 
@@ -550,6 +553,32 @@ export default class SocketHandle {
         }
     }
 
+    private async handleSendMessage(payload: ISendMessagePayload, callback: (response: IWSResponse) => void) {
+        const response: IWSResponse = {
+            status: "not ok",
+            message: "",
+            data: {},
+        };
+
+        try {
+            const {matchId, type, content, senderId} = payload;
+
+            await this.io
+                .to(matchId)
+                .timeout(10000)
+                .emitWithAck("showMessage", {senderId, content, type} as IShowMessagePayload);
+
+            response.status = "ok";
+            response.message = "success";
+        } catch (err: Error | unknown) {
+            console.log(err);
+            response.status = "not ok";
+            response.message = err instanceof Error ? err.message : "error";
+        } finally {
+            callback(response);
+        }
+    }
+
     private async handleDisconnect() {
         console.log("a user disconnected");
 
@@ -560,10 +589,10 @@ export default class SocketHandle {
                 const _Move = new Move(this.db);
 
                 const theMatch = await _Match.getTheMatchThePlayerIsPlaying(this.player.id);
-                console.log("🚀 ~ SocketHandle ~ handleDisconnect ~ theMatch:", theMatch);
 
                 if (theMatch) {
                     const socketRoom = this.io.sockets.adapter.rooms.get(theMatch.id);
+                    console.log("🚀 ~ SocketHandle ~ handleDisconnect ~ socketRoom:", socketRoom);
 
                     if (socketRoom) {
                         const socketIds = Array.from(socketRoom);
@@ -576,6 +605,8 @@ export default class SocketHandle {
                             .to(socketIds)
                             .timeout(10000)
                             .emitWithAck("playerHasLeft", {canceller: this.player} as IRoomCancelledPayload);
+                    } else {
+                        console.log("room not exists when disconnected");
                     }
                 }
 

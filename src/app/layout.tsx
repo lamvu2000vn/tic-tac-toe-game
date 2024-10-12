@@ -12,7 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-    title: "Tic-tac-toe Game",
+    title: "Tic-Tac-Toe Game",
     description: "Game Cờ Ca-rô",
 };
 

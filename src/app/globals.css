@@ -28,16 +28,24 @@ body {
   color: var(--neutral-900);
 }
 
-input {
+input,
+textarea {
   border: 1px solid var(--primary-2);
   outline: none;
   border-radius: 1rem;
-  height: 3rem;
   width: 100%;
-  padding: 0 1rem;
+  padding: .5rem 1rem;
   background-color: transparent;
+  font-size: 1rem;
+  box-sizing: border-box;
 }
 
-input:focus {
+textarea {
+  resize: none;
+  overflow: hidden;
+}
+
+input:focus,
+textarea:focus {
   outline: 1px solid var(--primary-2);
 }

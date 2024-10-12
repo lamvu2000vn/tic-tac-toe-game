@@ -26,18 +26,21 @@ import {
 import {Position} from "@/shared/types";
 import {convertToMyMatchInfo, showToast} from "@/utils/clientUtils";
 import {useRouter} from "next/navigation";
-import {useCallback, useEffect, useRef, useState} from "react";
+import {createContext, useCallback, useEffect, useRef, useState} from "react";
 import {useRecoilState, useRecoilValue} from "recoil";
+
+const WAITING_ACCEPT_TIMEOUT = 60000; // 60s
+const MY_MATCH_INFO_TIMEOUT = 60000; // 60s
+
+export const BoardContext = createContext<{
+    boardRef: React.MutableRefObject<HTMLDivElement | null>;
+} | null>(null);
 
 interface Props {
     params: {
         matchId: string;
     };
 }
-
-const WAITING_ACCEPT_TIMEOUT = 60000; // 60s
-const MY_MATCH_INFO_TIMEOUT = 60000; // 60s
-
 export default function Page(props: Props) {
     const router = useRouter();
     const playerInfo = useRecoilValue(playerInfoState)!;
@@ -54,6 +57,7 @@ export default function Page(props: Props) {
 
     const waitingAcceptTimer = useRef<NodeJS.Timeout | null>(null);
     const myMatchInfoTimer = useRef<NodeJS.Timeout | null>(null);
+    const boardRef = useRef<HTMLDivElement | null>(null);
 
     const handleCancelRequestPlayAgain = useCallback(
         async (canceller: IPlayerInfo | null = null) => {
@@ -311,32 +315,37 @@ export default function Page(props: Props) {
     }
 
     return (
-        <Card className="w-full h-full max-w-xl rounded-none overflow-hidden flex flex-col items-stretch gap-8">
-            <PreparingMatchModal show={showPreparingMatchModal} />
-            {myMatchInfo && (
-                <>
-                    <TwoPlayersInfo />
-                    <Board
-                        numberXCells={24}
-                        numberYCells={24}
-                        highlightMoves={highlightMoves}
-                        myMoves={myMoves}
-                        opponentMoves={opponentMoves}
-                    />
-                    <NavBar onRequestPlayAgain={handleRequestPlayerAgain} onLeaveRoom={handleLeaveRoom} />
-                    <InvitePlayAgainModal
-                        show={showPlayAgainModal}
-                        requester={playAgainRequester}
-                        onDeclineInvitation={() => handleCancelRequestPlayAgain(playerInfo)}
-                        onAcceptInvitation={handleAcceptInvitation}
-                    />
-                    <WaitingForAcceptModal
-                        show={showWaitingForAcceptModal}
-                        onCancelWaiting={() => handleCancelRequestPlayAgain(playerInfo)}
-                    />
-                    <RoomCancelledModal show={showRoomCancelledModal} />
-                </>
-            )}
-        </Card>
+        <BoardContext.Provider value={{boardRef: boardRef}}>
+            <Card
+                ref={boardRef}
+                className="w-full h-full max-w-xl rounded-none overflow-hidden flex flex-col items-stretch"
+            >
+                <PreparingMatchModal show={showPreparingMatchModal} />
+                {myMatchInfo && (
+                    <>
+                        <TwoPlayersInfo />
+                        <Board
+                            numberXCells={20}
+                            numberYCells={20}
+                            highlightMoves={highlightMoves}
+                            myMoves={myMoves}
+                            opponentMoves={opponentMoves}
+                        />
+                        <NavBar onRequestPlayAgain={handleRequestPlayerAgain} onLeaveRoom={handleLeaveRoom} />
+                        <InvitePlayAgainModal
+                            show={showPlayAgainModal}
+                            requester={playAgainRequester}
+                            onDeclineInvitation={() => handleCancelRequestPlayAgain(playerInfo)}
+                            onAcceptInvitation={handleAcceptInvitation}
+                        />
+                        <WaitingForAcceptModal
+                            show={showWaitingForAcceptModal}
+                            onCancelWaiting={() => handleCancelRequestPlayAgain(playerInfo)}
+                        />
+                        <RoomCancelledModal show={showRoomCancelledModal} />
+                    </>
+                )}
+            </Card>
+        </BoardContext.Provider>
     );
 }

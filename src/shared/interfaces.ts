@@ -1,4 +1,4 @@
-import {MatchStatus, PlayerTurn, PlayerType, Position} from "./types";
+import {MatchStatus, MessageType, PlayerTurn, PlayerType, Position} from "./types";
 
 // ======================= START DB =======================
 export interface IModel<T> {
@@ -93,6 +93,19 @@ export interface ILeaveTheMatchPayload {
 export interface IRoomCancelledPayload {
     canceller: IPlayerInfoOfMatch | null;
 }
+
+export interface ISendMessagePayload {
+    senderId: number;
+    type: MessageType;
+    content: string;
+    matchId: string;
+}
+
+export interface IShowMessagePayload {
+    senderId: number;
+    type: MessageType;
+    content: string;
+}
 // ======================= START SOCKET PAYLOAD =======================
 
 // ======================= START SOCKET RESPONSE =======================
@@ -158,6 +171,11 @@ export interface IMyMatchInfo {
     currentTurn: PlayerTurn;
     winner: PlayerTurn | null;
     matchStatus: MatchStatus;
+}
+
+export interface IMessage {
+    type: MessageType;
+    content: string;
 }
 
 // ======================= END GAME INFO =======================

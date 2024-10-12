@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Logo from "../../../images/tic-tac-toe-logo.png";
 import {LuLogIn} from "react-icons/lu";
 import {FaUserFriends} from "react-icons/fa";
 import {useRecoilValue} from "recoil";
@@ -34,7 +33,7 @@ export default function Home(props: Props) {
         <div className="w-full">
             <div className="w-full flex justify-center mb-7">
                 <Image
-                    src={Logo}
+                    src="/images/tic-tac-toe-logo.png"
                     alt="logo"
                     width={92}
                     height={92}

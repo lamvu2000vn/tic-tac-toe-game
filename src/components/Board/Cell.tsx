@@ -1,6 +1,4 @@
 import Image from "next/image";
-import xIcon from "../../images/icons/X-icon.svg";
-import oIcon from "../../images/icons/O-icon.svg";
 import {MatchStatus, PlayerType, Position} from "@/shared/types";
 import {memo, useEffect, useState} from "react";
 
@@ -21,7 +19,12 @@ export default memo(function Cell(props: Props) {
 
     const marked =
         markedBy !== null ? (
-            <Image src={markedBy === "XPlayer" ? xIcon : oIcon} alt="step" width={20} height={20} />
+            <Image
+                src={markedBy === "XPlayer" ? "/images/icons/X-icon.svg" : "/images/icons/O-icon.svg"}
+                alt="step"
+                width={20}
+                height={20}
+            />
         ) : null;
 
     const handleClick = () => {
@@ -56,7 +59,7 @@ export default memo(function Cell(props: Props) {
             {!marked && isMyTurn && matchStatus !== "completed" ? (
                 myType === "OPlayer" ? (
                     <Image
-                        src={oIcon}
+                        src="/images/icons/O-icon.svg"
                         alt="step"
                         width={20}
                         height={20}
@@ -64,7 +67,7 @@ export default memo(function Cell(props: Props) {
                     />
                 ) : (
                     <Image
-                        src={xIcon}
+                        src="/images/icons/X-icon.svg"
                         alt="step"
                         width={20}
                         height={20}

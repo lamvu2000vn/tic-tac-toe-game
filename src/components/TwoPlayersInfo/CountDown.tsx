@@ -3,19 +3,18 @@
 import {myMatchInfoState} from "@/libs/recoil/atoms/myMatchInfoAtom";
 import socket from "@/libs/socket.io/socketClient";
 import {IPlayerTimeoutPayload} from "@/shared/interfaces";
-import {useCallback, useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {useRecoilValue} from "recoil";
+import {CountdownCircleTimer} from "react-countdown-circle-timer";
 
-const TIMEOUT = 30;
+const TIMEOUT = 60;
 
 export default function CountDown() {
-    const [counter, setCounter] = useState<number>(TIMEOUT);
-    const [isTimeout, setIsTimeout] = useState<boolean>(false);
+    const [key, setKey] = useState<number>(0);
+    const [isCountdownPlaying, setIsCountdownPlaying] = useState<boolean>(true);
     const myMatchInfo = useRecoilValue(myMatchInfoState);
 
-    const {currentTurn, matchId, matchStatus, myInfo} = myMatchInfo!;
-
-    const timerId = useRef<NodeJS.Timeout | null>(null);
+    const {currentTurn, matchId, myInfo, matchStatus} = myMatchInfo!;
 
     const handleTimeout = useCallback(() => {
         if (currentTurn === "me") {
@@ -24,37 +23,35 @@ export default function CountDown() {
     }, [currentTurn, matchId, myInfo]);
 
     useEffect(() => {
-        if (isTimeout || matchStatus === "completed") return;
-
-        timerId.current = setTimeout(() => {
-            setCounter((state) => (state > 0 ? state - 1 : state));
-
-            if (counter <= 0) {
-                setIsTimeout(true);
-            }
-        }, 1000);
-
         return () => {
-            timerId.current && clearTimeout(timerId.current);
-        };
-    }, [counter, isTimeout, matchStatus]);
-
-    useEffect(() => {
-        return () => {
-            timerId.current && clearTimeout(timerId.current);
-            setCounter(TIMEOUT);
+            setKey((state) => state + 1);
         };
     }, [currentTurn]);
 
     useEffect(() => {
-        if (isTimeout) {
-            handleTimeout();
-        }
-    }, [handleTimeout, isTimeout]);
+        matchStatus === "completed" && setIsCountdownPlaying(false);
+    }, [matchStatus]);
 
     return (
-        <div className="w-14 sm:w-16 flex items-center justify-center">
-            <span className="text-xl sm:text-2xl">{counter}</span>
+        <div className="w-14 h-16 flex items-center justify-center">
+            <CountdownCircleTimer
+                key={key}
+                isPlaying={isCountdownPlaying}
+                duration={TIMEOUT}
+                initialRemainingTime={TIMEOUT}
+                size={56}
+                strokeWidth={8}
+                colors={["#2dd4bf", "#4ade80", "#facc15", "#f87171", "#dc2626"]}
+                colorsTime={[TIMEOUT, TIMEOUT * 0.75, TIMEOUT * 0.5, TIMEOUT * 0.25, 0]}
+                onComplete={() => {
+                    handleTimeout();
+                    return {
+                        shouldRepeat: false,
+                    };
+                }}
+            >
+                {({remainingTime}) => remainingTime}
+            </CountdownCircleTimer>
         </div>
     );
 }
